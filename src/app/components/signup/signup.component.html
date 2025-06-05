@@ -1,0 +1,149 @@
+<!-- <html>
+<body>
+    <div class="signup-container">
+        <div class="left-panel">
+          <img src="assets/images/rice_billing_image.jpg" alt="Company Logo" class="company-logo">
+            <div class="welcome-text">
+                <h1>Welcome</h1>
+                <p>Join us to experience rice milling services tailored to your needs. Whether you're a farmer, distributor, or business owner, we’re here to help you every step of the way.
+
+                Sign up now to get started and unlock the benefits of quality, efficiency, and reliability.</p>
+            </div>
+            <div class="illustration">🚀</div>
+        </div>
+
+        <div class="right-panel">
+            <div class="auth-header">
+                <h2>Sign Up</h2>
+                <p class="auth-subtitle">Create your account to get started</p>
+            </div>
+
+              <form (ngSubmit)="onSubmit(signupForm)" #signupForm="ngForm">
+                <div class="form-group">
+                    <label for="mobile">Mobile Number</label>
+                    <input type="tel" placeholder="Mobile Number" required [(ngModel)]="mobile" name="mobile" #mobileRef="ngModel">
+                    <div class="error" *ngIf="(mobileRef.invalid && (mobileRef.touched || submitted))">Mobile number is required</div>
+                 </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" placeholder="Email Address" required [(ngModel)]="email" name="email" #emailRef="ngModel">
+                   <div class="error" *ngIf="(emailRef.invalid && (emailRef.touched || submitted))">Valid email is required</div>
+                 </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                     <input type="password" placeholder="Password" required [(ngModel)]="password" name="password" #passwordRef="ngModel">
+                      <div class="error" *ngIf="(passwordRef.invalid && (passwordRef.touched || submitted))">Password is required</div>    
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    Sign Up
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>or</span>
+            </div>
+
+            <div class="footer-text">
+                Already have an account? <a href="/login">Sign In</a>
+            </div>
+        </div>
+    </div>
+    </body>
+    </html> -->
+
+<html>
+    <head></head>
+    <body>
+    <div class="signup-container">
+  <div class="left-panel">
+    <img src="assets/images/rice_billing_image.jpg" alt="Company Logo" class="company-logo" />
+    <div class="welcome-text">
+      <h1>Welcome</h1>
+      <p>
+        Join us to experience rice milling services tailored to your needs. Whether you're a farmer,
+        distributor, or business owner, we’re here to help you every step of the way.
+        Sign up now to get started and unlock the benefits of quality, efficiency, and reliability.
+      </p>
+    </div>
+    <div class="illustration">🚀</div>
+  </div>
+
+  <div class="right-panel">
+    <div class="auth-header">
+      <h2>Sign Up</h2>
+      <p class="auth-subtitle">Create your account to get started</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit(signupForm)" #signupForm="ngForm" novalidate>
+      <div class="form-group">
+        <label for="mobile">Mobile Number</label>
+        <input
+          type="tel"
+          id="mobile"
+          name="mobile"
+          placeholder="Mobile Number"
+          required
+          [(ngModel)]="mobile"
+          #mobileRef="ngModel"
+          class="form-control"
+        />
+        <div class="error" *ngIf="mobileRef.invalid && (mobileRef.touched || submitted)">
+          Mobile number is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="Email Address"
+          required
+          email
+          [(ngModel)]="email"
+          #emailRef="ngModel"
+          class="form-control"
+        />
+        <div class="error" *ngIf="emailRef.invalid && (emailRef.touched || submitted)">
+          Valid email is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Password"
+          required
+          minlength="6"
+          [(ngModel)]="password"
+          #passwordRef="ngModel"
+          class="form-control"
+        />
+        <div class="error" *ngIf="passwordRef.invalid && (passwordRef.touched || submitted)">
+          Password is required (min 6 characters)
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="signupForm.invalid && submitted">
+        Sign Up
+      </button>
+    </form>
+
+    <div class="divider">
+      <span>or</span>
+    </div>
+
+    <div class="footer-text">
+      Already have an account? <a routerLink="/login">Sign In</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

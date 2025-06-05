@@ -1,0 +1,131 @@
+<div class="dashboard-container">
+  <!-- Header Section -->
+  <header class="header">
+    <div class="header-content">
+      <!-- Logo -->
+      <div class="logo-container">
+        <img src="https://res.cloudinary.com/dw7dhefpb/image/upload/v1748453074/WhatsApp_Image_2025-05-28_at_22.20.10_178194aa_kak0w1.jpg" 
+             alt="Rice Mills Logo" 
+             class="logo">
+      </div>
+
+      <!-- Navigation -->
+      <nav class="nav-menu">
+        <ul class="nav-list">
+          <li class="nav-item">
+            <button class="nav-link" (click)="goToInvoices()">My Invoices</button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Mobile Menu Toggle -->
+      <button class="menu-toggle" (click)="toggleMenu()">
+        <span class="menu-bar"></span>
+        <span class="menu-bar"></span>
+        <span class="menu-bar"></span>
+      </button>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav" [class.active]="isMenuOpen">
+      <ul class="mobile-nav-list">
+        <li class="mobile-nav-item">
+          <button class="mobile-nav-link" (click)="goToInvoices()">My Invoices</button>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero Banner Section -->
+  <section class="hero-section">
+    <div class="hero-container">
+      <img src="https://res.cloudinary.com/dw7dhefpb/image/upload/v1748454631/WhatsApp_Image_2025-05-28_at_23.16.01_7c44d7a2_idqppo.jpg" 
+           alt="Rice Mills Dashboard" 
+           class="hero-image">
+      <div class="hero-overlay">
+        <div class="hero-content">
+          <h1 class="hero-title">Welcome to Rice Mills Management System</h1>
+          <p class="hero-subtitle">Streamline your billing process with our comprehensive cart management solution</p>
+          <button class="hero-cta">Get Started</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="container">
+      <h2 class="section-title">Comprehensive Cart Billing and Management System</h2>
+
+      <div class="features-grid">
+        <!-- Feature Card 1 -->
+        <div class="feature-card">
+          <div class="feature-image-container">
+            <img src="https://res.cloudinary.com/dw7dhefpb/image/upload/v1748455081/WhatsApp_Image_2025-05-28_at_23.26.58_7ce741ed_cyufex.jpg" 
+                 alt="Cart Entry" 
+                 class="feature-image">
+          </div>
+          <div class="feature-content">
+            <h3 class="feature-title">Cart Entry and Weight Management</h3>
+            <p class="feature-description">
+              Efficiently manage cart entries with precise weight tracking and real-time updates for accurate billing.
+            </p>
+          </div>
+        </div>
+
+        <!-- Feature Card 2 -->
+        <div class="feature-card">
+          <div class="feature-image-container">
+            <img src="https://res.cloudinary.com/dw7dhefpb/image/upload/v1748455082/WhatsApp_Image_2025-05-28_at_23.26.58_e791c467_vznf8u.jpg" 
+                 alt="Billing" 
+                 class="feature-image">
+          </div>
+          <div class="feature-content">
+            <h3 class="feature-title">Billing and Invoice Generation</h3>
+            <p class="feature-description">
+              Generate professional invoices instantly with automated calculations and customizable templates.
+            </p>
+          </div>
+        </div>
+
+        <!-- Feature Card 3 -->
+        <div class="feature-card">
+          <div class="feature-image-container">
+            <img src="https://res.cloudinary.com/dw7dhefpb/image/upload/v1748455081/WhatsApp_Image_2025-05-28_at_23.26.57_361e620c_savoe1.jpg" 
+                 alt="Reports" 
+                 class="feature-image">
+          </div>
+          <div class="feature-content">
+            <h3 class="feature-title">Transaction History and Reports</h3>
+            <p class="feature-description">
+              Access comprehensive transaction history and generate detailed reports for better business insights.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🧾 Invoice Modal Section -->
+  <div class="invoice-modal-overlay" *ngIf="isInvoiceModalOpen">
+    <div class="invoice-container">
+      <button class="close-btn" (click)="closeModal()">×</button>
+      <h2>Invoice Form</h2>
+      <form>
+        <div class="form-group">
+          <label for="invoiceNumber">Invoice Number</label>
+          <input type="text" id="invoiceNumber" placeholder="Enter Invoice Number" />
+        </div>
+        <div class="form-group">
+          <label for="invoiceDate">Invoice Date</label>
+          <input type="date" id="invoiceDate" />
+        </div>
+        <div class="form-group">
+          <label for="amount">Amount</label>
+          <input type="number" id="amount" placeholder="Enter Amount" />
+        </div>
+        <button type="submit" class="submit-btn">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>

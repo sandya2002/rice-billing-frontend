@@ -1,0 +1,108 @@
+<!-- <html>
+    <head></head>
+    <body>
+    <div class="login-container">
+        <div class="auth-header">
+            <h2>Welcome Back</h2>
+            <p class="auth-subtitle">Sign in to your account to continue</p>
+        </div>
+
+        <form *ngIf="!otpSent" (ngSubmit)="sendOtp()" #loginForm="ngForm">
+          <div class="form-group">
+            <label for="mobile">Mobile Number</label>
+            <input type="tel" id="mobile" name="mobile" [(ngModel)]="mobileNumber" required>
+            <div class="error" *ngIf="loginForm.submitted && !mobileNumber">Mobile number is required</div>
+           </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" [(ngModel)]="password" required>
+            <div class="error" *ngIf="loginForm.submitted && !password">Password is required</div>
+          </div>
+          <div class="footer-text">
+                <a (click)="navigateToForgotPassword()" style="cursor: pointer;">Forgot Password?</a>
+          </div>
+
+          <div class="divider" *ngIf="otpSent">
+             <span>or</span>
+          </div>
+            <div class="footer-text" *ngIf="otpSent">
+             Didn't receive OTP? <a (click)="resendOtp()" style="cursor: pointer;">Resend OTP</a>
+            </div>
+          <button type="submit" class="submit-btn">Sign In</button>
+        </form>
+        <form *ngIf="otpSent" (ngSubmit)="verifyOtp()" #otpForm="ngForm">
+            <div class="form-group">
+              <label for="otp">Enter OTP</label>
+              <input type="text" id="otp" name="otp" [(ngModel)]="otp" required>
+              <div class="error" *ngIf="otpForm.submitted && !otp">OTP is required</div>
+            </div>
+            <button type="submit" class="submit-btn">Verify OTP</button>
+        </form>
+      <div class="divider" *ngIf="otpSent">
+        <span>or</span>
+      </div>
+
+        <div class="footer-text">
+            Don't have an account? <a href="/signup">Sign Up</a>
+        </div>
+    </div>
+</body>
+</html> -->
+
+
+<html>
+<body>
+<div class="login-container">
+  <div class="auth-header">
+    <h2>Welcome Back</h2>
+    <p class="auth-subtitle">Sign in to your account to continue</p>
+  </div>
+
+  <!-- Step 1: Request OTP by email -->
+  <form *ngIf="!otpSent" (ngSubmit)="sendOtp()" #emailForm="ngForm">
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        [(ngModel)]="email"
+        required
+      />
+      <div class="error" *ngIf="emailForm.submitted && !email">
+        Email is required
+      </div>
+    </div>
+    <button type="submit" class="submit-btn">Send OTP</button>
+  </form>
+
+  <!-- Step 2: OTP input and Verify -->
+  <form *ngIf="otpSent" (ngSubmit)="verifyOtp()" #otpForm="ngForm">
+    <div class="form-group">
+      <label for="otp">Enter OTP</label>
+      <input
+        type="text"
+        id="otp"
+        name="otp"
+        [(ngModel)]="otp"
+        required
+      />
+      <div class="error" *ngIf="otpForm.submitted && !otp">
+        OTP is required
+      </div>
+    </div>
+    <div class="footer-text">
+      Didn't receive OTP?
+      <a (click)="resendOtp()" style="cursor: pointer;">Resend OTP</a>
+    </div>
+    <button type="submit" class="submit-btn">Verify OTP</button>
+  </form>
+
+  <div class="footer-text">
+    Don't have an account?
+    <a href="/signup">Sign Up</a>
+  </div>
+</div>
+</body>
+</html>

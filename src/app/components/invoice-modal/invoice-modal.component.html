@@ -1,0 +1,473 @@
+ <div class="invoice-modal-overlay">
+  <div class="invoice-container">
+    <!-- Close button -->
+    <button class="close-btn" (click)="closeModal()">×</button>
+    
+    <!-- Edit Mode Indicator -->
+    <div class="edit-mode-indicator" *ngIf="isEditMode">
+      <span class="edit-badge">Editing Invoice: {{ invoiceNo }}</span>
+    </div>
+    
+    <!-- Invoice Content -->
+    <div class="invoice-wrapper">
+      <!-- Header Section -->
+      <div class="invoice-header">
+        <div class="header-left">
+          <div class="logo-box">
+            <img src="https://res.cloudinary.com/dw7dhefpb/image/upload/v1748453074/WhatsApp_Image_2025-05-28_at_22.20.10_178194aa_kak0w1.jpg" 
+                 alt="Logo" 
+                 class="company-logo">
+            <div class="company-name-box">SREENITHI AGRO TRADING</div>
+          </div>
+        </div>
+        
+        <div class="header-center">
+          <h1 class="company-title">SREENITHI AGRO TRADING</h1>
+          <p class="company-address">20 A - M.A. Road, Phonix Bay, Port Blair, Andaman and Nicobar Islands - 744101</p>
+          <p class="company-gstin">GSTIN: 35BOFPC2762F1ZA</p>
+          <p class="company-phone">PHONE: 9443928573, 9444894853</p>
+        </div>
+        
+        <div class="header-right">
+          <p class="bill-type">EXEMPTED BILL ORIGINAL/DUPLICATE/TRIPLICATE</p>
+        </div>
+      </div>
+      
+      <!-- Invoice Details Section -->
+      <div class="invoice-info">
+        <table class="info-table">
+          <tr>
+            <td class="info-label">INVOICE NO:</td>
+            <td class="info-input">
+              <input type="text" [(ngModel)]="invoiceNo" [readonly]="isEditMode">
+            </td>
+            <td class="info-label">TRANSPORT MODE:</td>
+            <td class="info-input">
+              <input type="text" [(ngModel)]="transportMode" placeholder="Sri Balaji Shipping">
+            </td>
+          </tr>
+          <tr>
+            <td class="info-label">INVOICE DATE:</td>
+            <td class="info-input">
+              <input type="text" [(ngModel)]="invoiceDate">
+            </td>
+            <td class="info-label">VEHICLE NO:</td>
+            <td class="info-input">
+              <input type="text" [(ngModel)]="vehicleNo">
+            </td>
+          </tr>
+          <tr>
+            <td class="info-label" colspan="2">STATE: ANDAMAN, STATE CODE: 35</td>
+            <td class="info-label">REFERENCE NO:</td>
+            <td class="info-input">
+              <input type="text" [(ngModel)]="referenceNo">
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <!-- Billing and Shipping Details -->
+      <div class="address-section">
+        <table class="address-table">
+          <tr>
+            <th class="address-header">DETAILS OF RECEIVER / BILLING ADDRESS</th>
+            <th class="address-header">DETAILS OF THE CONSIGNEE / SHIPPING ADDRESS</th>
+          </tr>
+          <tr>
+            <td class="address-cell">
+              <table class="detail-table">
+                <tr>
+                  <td class="detail-label">NAME:</td>
+                  <td class="detail-input">
+                    <input type="text" [(ngModel)]="billingName" placeholder="KANNIGA PARAMESHWARI STORE">
+                  </td>
+                </tr>
+                <tr>
+                  <td class="detail-label">ADDRESS:</td>
+                  <td class="detail-input">
+                    <textarea [(ngModel)]="billingAddress" rows="2" placeholder="TTI Road, Garacharma,&#10;Port Blair Andaman"></textarea>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="detail-label">PHONE:</td>
+                  <td class="detail-input">
+                    <input type="text" [(ngModel)]="billingPhone" placeholder="9933284429, 9474298643">
+                  </td>
+                </tr>
+                <tr>
+                  <td class="detail-label">GST:</td>
+                  <td class="detail-input">
+                    <input type="text" [(ngModel)]="billingGst" placeholder="35CBYPP8824L1ZK">
+                  </td>
+                </tr>
+              </table>
+            </td>
+            <td class="address-cell">
+              <table class="detail-table">
+                <tr>
+                  <td class="detail-label">NAME:</td>
+                  <td class="detail-input">
+                    <input type="text" [(ngModel)]="shippingName">
+                  </td>
+                </tr>
+                <tr>
+                  <td class="detail-label">ADDRESS:</td>
+                  <td class="detail-input">
+                    <textarea [(ngModel)]="shippingAddress" rows="2"></textarea>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="detail-label">PHONE:</td>
+                  <td class="detail-input">
+                    <input type="text" [(ngModel)]="shippingPhone">
+                  </td>
+                </tr>
+                <tr>
+                  <td class="detail-label">GST:</td>
+                  <td class="detail-input">
+                    <input type="text" [(ngModel)]="shippingGst">
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <!-- Items Table -->
+      <div class="items-section">
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>S.NO</th>
+              <th>DESCRIPTION</th>
+              <th>QTY</th>
+              <th>UNIT KG</th>
+              <th>UNIT PRICE</th>
+              <th>TAX RATE</th>
+              <th>SUB TOTAL</th>
+              <th>TOTAL</th>
+              <th>ACTION</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of invoiceItems; let i = index">
+              <td>{{ item.sno }}</td>
+              <td>
+                <input type="text" 
+                       [(ngModel)]="item.description" 
+                       (change)="calculateRow(i)"
+                       placeholder="Enter description">
+              </td>
+              <td>
+                <input type="number" 
+                       [(ngModel)]="item.quantity" 
+                       (change)="calculateRow(i)"
+                       placeholder="0">
+              </td>
+              <td>
+                <input type="number" 
+                       [(ngModel)]="item.unit" 
+                       (change)="calculateRow(i)"
+                       placeholder="0">
+              </td>
+              <td>
+                <input type="number" 
+                       [(ngModel)]="item.unitPrice" 
+                       (change)="calculateRow(i)"
+                       placeholder="0">
+              </td>
+              <td>
+                <input type="number" 
+                       [(ngModel)]="item.taxRate" 
+                       (change)="calculateRow(i)"
+                       placeholder="0">
+              </td>
+              <td>{{ item.subTotal.toFixed(2) }}</td>
+              <td>{{ item.total.toFixed(2) }}</td>
+              <td>
+                <button class="remove-btn" 
+                        (click)="removeRow(i)" 
+                        *ngIf="invoiceItems.length > 1">×</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <!-- Add Row Button -->
+        <div class="add-row-container">
+          <button class="add-row-btn" (click)="addNewRow()">+ Add New Row</button>
+        </div>
+      </div>
+      
+      <!-- Calculation Section -->
+      <div class="calculation-section">
+        <table class="calculation-table">
+          <tr>
+            <td class="calc-label">SUBTOTAL</td>
+            <td class="calc-value">{{ getSubtotal().toFixed(2) }}</td>
+            <td class="calc-total">{{ getTotal().toFixed(2) }}</td>
+          </tr>
+          <tr>
+            <td class="calc-label">SPECIAL DISCOUNT</td>
+            <td class="calc-value">
+              <input type="number" 
+                     [(ngModel)]="specialDiscount" 
+                     placeholder="0.00">
+            </td>
+            <td class="calc-total">{{ specialDiscount.toFixed(2) }}</td>
+          </tr>
+          <tr>
+            <td class="calc-label">SUBTOTAL LESS DISCOUNT</td>
+            <td class="calc-value"></td>
+            <td class="calc-total">{{ getSubtotalLessDiscount().toFixed(2) }}</td>
+          </tr>
+          <tr>
+            <td class="calc-label">TAX RATE</td>
+            <td class="calc-value"></td>
+            <td class="calc-total">{{ getTaxRate().toFixed(2) }}</td>
+          </tr>
+          <tr>
+            <td class="calc-label">TOTAL TAX</td>
+            <td class="calc-value"></td>
+            <td class="calc-total">{{ getTotalTax().toFixed(2) }}</td>
+          </tr>
+          <tr>
+            <td class="calc-label">SHIPPING/HANDLING</td>
+            <td class="calc-value">
+              <input type="number" 
+                     [(ngModel)]="shippingHandling" 
+                     placeholder="0.00">
+            </td>
+            <td class="calc-total">{{ shippingHandling.toFixed(2) }}</td>
+          </tr>
+          <tr class="balance-due-row">
+            <td class="calc-label">Balance Due</td>
+            <td class="calc-value"></td>
+            <td class="calc-total">{{ getBalanceDue().toFixed(2) }}</td>
+          </tr>
+        </table>
+      </div>
+      
+      <!-- Action buttons at bottom -->
+      <div class="form-action-buttons">
+        <button class="print-btn" (click)="printInvoice()">Print Invoice</button>
+        <button class="reset-btn" (click)="resetForm()">Reset Form</button>
+        <button class="done-btn" (click)="saveInvoice()">
+          {{ isEditMode ? 'Update Invoice' : 'Done & Save' }}
+        </button>
+      </div>
+      
+      <!-- Saved Invoices Section - Now inside the invoice wrapper -->
+      <div class="saved-invoices-container" *ngIf="savedInvoices.length > 0">
+        <h2 class="saved-invoices-title">Saved Invoices</h2>
+        
+        <!-- Search Bar -->
+        <div class="search-container">
+          <input type="text" 
+                 class="search-input" 
+                 [(ngModel)]="searchTerm" 
+                 (keyup)="searchInvoices()"
+                 placeholder="Search by customer name...">
+        </div>
+        
+        <!-- Invoice Cards -->
+        <div class="invoice-cards-grid">
+          <div class="invoice-card" *ngFor="let invoice of filteredInvoices">
+                        <div class="card-header">
+              <h3>{{ invoice.billingName }}</h3>
+              <span class="invoice-number">{{ invoice.invoiceNo }}</span>
+            </div>
+            <div class="card-body">
+              <p><strong>Date:</strong> {{ invoice.invoiceDate }}</p>
+<p *ngIf="invoice?.items"><strong>Total Items:</strong> {{ invoice.items.length }}</p>
+              <p><strong>Transport:</strong> {{ invoice.transportMode || 'N/A' }}</p>
+                            <p class="total-amount"><strong>Total Amount:</strong> ₹{{ invoice.totalAmount.toFixed(2) }}</p>
+            </div>
+            <div class="card-actions">
+              <button class="view-btn" (click)="viewInvoice(invoice)">View</button>
+              <button class="delete-btn" (click)="deleteInvoice(invoice.id)">Delete</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- No Results Message -->
+        <div class="no-results" *ngIf="filteredInvoices.length === 0 && searchTerm">
+          <p>No invoices found for "{{ searchTerm }}"</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> give updated html
+
+<!-- 
+<div class="invoice-modal-overlay">
+  <div class="invoice-container">
+    <button class="close-btn" (click)="closeModal()">×</button>
+
+    <div class="edit-mode-indicator" *ngIf="isEditMode">
+      <span class="edit-badge">Editing Invoice: {{ invoiceNo }}</span>
+    </div>
+
+    <div class="invoice-wrapper">
+      <div class="invoice-header">
+        <div class="header-left">
+          <div class="logo-box">
+            <img src="https://res.cloudinary.com/dw7dhefpb/image/upload/v1748453074/WhatsApp_Image_2025-05-28_at_22.20.10_178194aa_kak0w1.jpg" alt="Logo" class="company-logo">
+            <div class="company-name-box">SREENITHI AGRO TRADING</div>
+          </div>
+        </div>
+        <div class="header-center">
+          <h1 class="company-title">SREENITHI AGRO TRADING</h1>
+          <p class="company-address">20 A - M.A. Road, Phonix Bay, Port Blair, Andaman and Nicobar Islands - 744101</p>
+          <p class="company-gstin">GSTIN: 35BOFPC2762F1ZA</p>
+          <p class="company-phone">PHONE: 9443928573, 9444894853</p>
+        </div>
+        <div class="header-right">
+          <p class="bill-type">EXEMPTED BILL ORIGINAL/DUPLICATE/TRIPLICATE</p>
+        </div>
+      </div>
+
+      <div class="invoice-info">
+        <table class="info-table">
+          <tr>
+            <td class="info-label">INVOICE NO:</td>
+            <td class="info-input"><input type="text" [(ngModel)]="invoiceNo" [readonly]="isEditMode"></td>
+            <td class="info-label">TRANSPORT MODE:</td>
+            <td class="info-input"><input type="text" [(ngModel)]="transportMode"></td>
+          </tr>
+          <tr>
+            <td class="info-label">INVOICE DATE:</td>
+            <td class="info-input"><input type="text" [(ngModel)]="invoiceDate"></td>
+            <td class="info-label">VEHICLE NO:</td>
+            <td class="info-input"><input type="text" [(ngModel)]="vehicleNo"></td>
+          </tr>
+          <tr>
+            <td class="info-label" colspan="2">STATE: ANDAMAN, STATE CODE: 35</td>
+            <td class="info-label">REFERENCE NO:</td>
+            <td class="info-input"><input type="text" [(ngModel)]="referenceNo"></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="address-section">
+        <table class="address-table">
+          <tr>
+            <th>DETAILS OF RECEIVER / BILLING ADDRESS</th>
+            <th>DETAILS OF THE CONSIGNEE / SHIPPING ADDRESS</th>
+          </tr>
+          <tr>
+            <td>
+              <table class="detail-table">
+                <tr><td>NAME:</td><td><input type="text" [(ngModel)]="billingName"></td></tr>
+                <tr><td>ADDRESS:</td><td><textarea rows="2" [(ngModel)]="billingAddress"></textarea></td></tr>
+                <tr><td>PHONE:</td><td><input type="text" [(ngModel)]="billingPhone"></td></tr>
+                <tr><td>GST:</td><td><input type="text" [(ngModel)]="billingGst"></td></tr>
+              </table>
+            </td>
+            <td>
+              <table class="detail-table">
+                <tr><td>NAME:</td><td><input type="text" [(ngModel)]="shippingName"></td></tr>
+                <tr><td>ADDRESS:</td><td><textarea rows="2" [(ngModel)]="shippingAddress"></textarea></td></tr>
+                <tr><td>PHONE:</td><td><input type="text" [(ngModel)]="shippingPhone"></td></tr>
+                <tr><td>GST:</td><td><input type="text" [(ngModel)]="shippingGst"></td></tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="items-section">
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>S.NO</th>
+              <th>DESCRIPTION</th>
+              <th>QTY</th>
+              <th>UNIT KG</th>
+              <th>UNIT PRICE</th>
+              <th>TAX RATE</th>
+              <th>SUB TOTAL</th>
+              <th>TOTAL</th>
+              <th>ACTION</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of invoiceItems; let i = index">
+              <td>{{ item.sno }}</td>
+              <td><input type="text" [(ngModel)]="item.description" (input)="calculateRow(i)"></td>
+              <td><input type="number" [(ngModel)]="item.qty" (input)="calculateRow(i)"></td>
+              <td><input type="number" [(ngModel)]="item.unitKg" (input)="calculateRow(i)"></td>
+              <td><input type="number" [(ngModel)]="item.unitPrice" (input)="calculateRow(i)"></td>
+  <td><input type="number" [(ngModel)]="item.taxRate" (input)="calculateRow(i)"></td>
+              <td>{{ item.subTotal.toFixed(2) }}</td>
+              <td>{{ item.total.toFixed(2) }}</td>
+              <td>
+                <button (click)="removeRow(i)" *ngIf="invoiceItems.length > 1">×</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="add-row-container">
+          <button (click)="addNewRow()">+ Add New Row</button>
+        </div>
+      </div>
+
+      <div class="calculation-section">
+        <table class="calculation-table">
+          <tr><td>SUBTOTAL</td><td>{{ getSubtotal().toFixed(2) }}</td></tr>
+          <tr>
+            <td>SPECIAL DISCOUNT</td>
+            <td><input type="number" [(ngModel)]="specialDiscount"></td>
+          </tr>
+          <tr><td>SUBTOTAL LESS DISCOUNT</td><td>{{ getSubtotalLessDiscount().toFixed(2) }}</td></tr>
+          <tr><td>TOTAL TAX</td><td>{{ getTotalTax().toFixed(2) }}</td></tr>
+          <tr>
+            <td>SHIPPING/HANDLING</td>
+            <td><input type="number" [(ngModel)]="shippingHandling"></td>
+          </tr>
+          <tr class="balance-due-row">
+            <td><strong>Balance Due</strong></td>
+            <td><strong>{{ getBalanceDue().toFixed(2) }}</strong></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="form-action-buttons">
+        <button (click)="printInvoice()">Print</button>
+        <button (click)="resetForm()">Reset</button>
+        <button (click)="saveInvoice()">{{ isEditMode ? 'Update Invoice' : 'Done & Save' }}</button>
+        <button (click)="generateExcel()">Download Excel</button>
+      </div>
+
+      <div *ngIf="saveInvoice.length > 0" class="saved-invoices-container">
+        <h2>Saved Invoices</h2>
+        <input type="text" [(ngModel)]="searchTerm" placeholder="Search Invoices">
+<button (click)="searchInvoices(searchTerm)">Search</button>
+        <div class="invoice-cards-grid">
+          <div class="invoice-card" *ngFor="let invoice of filteredInvoices">
+            <div class="card-header">
+              <h3>{{ invoice.billingName }}</h3>
+              <span>{{ invoice.invoiceNo }}</span>
+            </div>
+            <div class="card-body">
+              <p><strong>Date:</strong> {{ invoice.invoiceDate }}</p>
+              <p><strong>Total Items:</strong> {{ invoice.items.length }}</p>
+              <p><strong>Transport:</strong> {{ invoice.transportMode || 'N/A' }}</p>
+              <p><strong>Total:</strong> ₹{{ invoice.totalAmount.toFixed(2) }}</p>
+            </div>
+            <div class="card-actions">
+              <button (click)="viewInvoice(invoice)">View</button>
+              <button (click)="deleteInvoice(invoice.id)">Delete</button>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="filteredInvoices.length === 0 && searchTerm">
+          <p>No results for "{{ searchTerm }}"</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 
+
+-->
