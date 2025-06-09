@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { InvoiceService } from './invoice-modal.service';
+import { InvoiceData } from './invoice.model';
 interface InvoiceItem {
   sno: number;
   description: string;
@@ -122,97 +123,6 @@ export class InvoiceModalComponent implements OnInit {
         : 1;
     }
   }
-  
-  // saveInvoiceOne(): void {
-  //   // Validate form
-  //   if (!this.invoiceNo || !this.billingName) {
-  //     alert('Please fill Invoice Number and Billing Name at minimum');
-  //     return;
-  //   }
-    
-  //   // Check if at least one item has data
-  //   const hasValidItem = this.invoiceItems.some(item => 
-  //     item.description && item.quantity > 0 && item.unitPrice > 0
-  //   );
-    
-  //   if (!hasValidItem) {
-  //     alert('Please add at least one item with description, quantity and price');
-  //     return;
-  //   }
-    
-  //   if (this.isEditMode && this.editingInvoiceId !== null) {
-  //     // Update existing invoice
-  //     const invoiceIndex = this.savedInvoices.findIndex(inv => inv.id === this.editingInvoiceId);
-      
-  //     if (invoiceIndex !== -1) {
-  //       // Update the existing invoice
-  //       this.savedInvoices[invoiceIndex] = {
-  //         id: this.editingInvoiceId,
-  //         invoiceNo: this.invoiceNo,
-  //         invoiceDate: this.invoiceDate,
-  //         billingName: this.billingName,
-  //         totalAmount: this.getBalanceDue(),
-  //         items: [...this.invoiceItems],
-  //         transportMode: this.transportMode,
-  //         vehicleNo: this.vehicleNo,
-  //         referenceNo: this.referenceNo,
-  //         billingAddress: this.billingAddress,
-  //         billingPhone: this.billingPhone,
-  //         billingGst: this.billingGst,
-  //         shippingName: this.shippingName,
-  //         shippingAddress: this.shippingAddress,
-  //         shippingPhone: this.shippingPhone,
-  //         shippingGst: this.shippingGst,
-  //         specialDiscount: this.specialDiscount,
-  //         shippingHandling: this.shippingHandling
-  //       };
-        
-  //       // Update filtered invoices
-  //       this.filteredInvoices = [...this.savedInvoices];
-        
-  //       // Save to localStorage
-  //       localStorage.setItem('savedInvoices', JSON.stringify(this.savedInvoices));
-        
-  //       // Show success message
-  //       alert('Invoice updated successfully!');
-  //     }
-  //   } else {
-  //     // Create new invoice
-  //     const newInvoice: SavedInvoice = {
-  //       id: this.nextInvoiceId++,
-  //       invoiceNo: this.invoiceNo,
-  //       invoiceDate: this.invoiceDate,
-  //       billingName: this.billingName,
-  //       totalAmount: this.getBalanceDue(),
-  //       items: [...this.invoiceItems],
-  //       transportMode: this.transportMode,
-  //       vehicleNo: this.vehicleNo,
-  //       referenceNo: this.referenceNo,
-  //       billingAddress: this.billingAddress,
-  //       billingPhone: this.billingPhone,
-  //       billingGst: this.billingGst,
-  //       shippingName: this.shippingName,
-  //       shippingAddress: this.shippingAddress,
-  //       shippingPhone: this.shippingPhone,
-  //       shippingGst: this.shippingGst,
-  //       specialDiscount: this.specialDiscount,
-  //       shippingHandling: this.shippingHandling
-  //     };
-      
-  //     // Add to saved invoices
-  //     this.savedInvoices.push(newInvoice);
-  //     this.filteredInvoices = [...this.savedInvoices];
-      
-  //     // Save to localStorage
-  //     localStorage.setItem('savedInvoices', JSON.stringify(this.savedInvoices));
-      
-  //     // Show success message
-  //     alert('Invoice saved successfully!');
-  //   }
-    
-  //   // Reset form
-  //   this.resetForm();
-  // }
   
   resetForm(): void {
     // Reset edit mode
@@ -378,62 +288,28 @@ export class InvoiceModalComponent implements OnInit {
     closeModal(): void {
     this.router.navigate(['/dashboard']);
   }
-
-
-  //   saveInvoice(): void {
-  //   this.invoiceService.generateBill({
-  //     invoiceNo: this.invoiceNo,
-  //     invoiceDate: this.invoiceDate,
-  //     billingName: this.billingName,
-  //     totalAmount: this.getBalanceDue(),
-  //     items: this.invoiceItems,
-  //     transportMode: this.transportMode,
-  //     vehicleNo: this.vehicleNo,
-  //     referenceNo: this.referenceNo,
-  //     billingAddress: this.billingAddress,
-  //     billingPhone: this.billingPhone,
-  //     billingGst: this.billingGst,
-  //     shippingName: this.shippingName,
-  //     shippingAddress: this.shippingAddress,
-  //     shippingPhone: this.shippingPhone,
-  //     shippingGst: this.shippingGst,
-  //     specialDiscount: this.specialDiscount,
-  //     shippingHandling: this.shippingHandling
-  //   }).subscribe({
-  //     next: (response: Blob) => {
-  //       const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  //       const downloadUrl = URL.createObjectURL(blob);
-  //       const a = document.createElement('a');
-  //       a.href = downloadUrl;
-  //       a.download = `${this.invoiceNo}.xlsx`;
-  //       a.click();
-  //       alert('Invoice saved and downloaded successfully!');
-  //       this.resetForm();
-  //     },
-  //     error: (err) => {
-  //       console.error('Error saving invoice to backend', err);
-  //       alert('Error saving invoice. Please try again.');
-  //     }
-  //   });
-  // }
   saveInvoice(): void {
-  // Prepare invoice items excluding `sno`
-  const cleanedItems = this.invoiceItems.map(item => ({
-    description: item.description,
-    quantity: item.quantity,
-    unit: item.unit,
-    unitPrice: item.unitPrice,
-    taxRate: item.taxRate,
-    subTotal: item.subTotal,
-    total: item.total
-  }));
+  // Validate form
+  if (!this.invoiceNo || !this.billingName) {
+    alert('Please fill Invoice Number and Billing Name at minimum');
+    return;
+  }
+
+  const hasValidItem = this.invoiceItems.some(item =>
+    item.description && item.quantity > 0 && item.unitPrice > 0
+  );
+
+  if (!hasValidItem) {
+    alert('Please add at least one item with description, quantity and price');
+    return;
+  }
 
   this.invoiceService.generateBill({
     invoiceNo: this.invoiceNo,
     invoiceDate: this.invoiceDate,
     billingName: this.billingName,
     totalAmount: this.getBalanceDue(),
-    items: cleanedItems,
+    items: this.invoiceItems,
     transportMode: this.transportMode,
     vehicleNo: this.vehicleNo,
     referenceNo: this.referenceNo,
@@ -461,10 +337,51 @@ export class InvoiceModalComponent implements OnInit {
     },
     error: (err) => {
       console.error('Error saving invoice to backend', err);
-      alert('Error saving invoice. Please try again.');
+      alert('Failed to save invoice to backend');
     }
   });
 }
 
 }
+// export class InvoiceComponent {
+//   invoiceRequest: InvoiceData = {
+//     receivernamecloumncell: 'Receiver Name',
+//     adderssrow1: 'Address Line 1',
+//     adderssrow2: 'Address Line 2',
+//     phonenumberrow: '9876543210',
+//     gstrow: 'GST123456',
+
+//     shippingnamecloumncell: 'Shipping Name',
+//     shippingadderssrow1: 'Shipping Address Line 1',
+//     shippingadderssrow2: 'Shipping Address Line 2',
+//     shippingphonenumberrow: '9876543210',
+//     shippinggstrow: 'GST654321',
+
+//     transportmoderow: 'By Truck',
+//     vechilenorow: 'TN01AB1234',
+//     referencenorow: '123456',
+//     specialDiscount: 50,
+//     finaltaxvalue: 225,
+
+//     products: [
+//       { description: 'Rice', quantity: 10, unit: '25', unitPrice: '50.0', taxRate: '5.0' },
+//       { description: 'Wheat', quantity: 5, unit: '50', unitPrice: '45.0', taxRate: '5.0' },
+//       { description: 'Wheat', quantity: 5, unit: '50', unitPrice: '45.0', taxRate: '5.0' }
+//     ]
+//   };
+
+//   constructor(private invoiceService: InvoiceService) {}
+
+//   generateExcel() {
+//     this.invoiceService['generateInvoice'](this.invoiceRequest).subscribe((response: BlobPart) => {
+//       const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+//       const url = window.URL.createObjectURL(blob);
+//       const a = document.createElement('a');
+//       a.href = url;
+//       a.download = 'invoice.xlsx';
+//       a.click();
+//       window.URL.revokeObjectURL(url);
+//     });
+//   }
+// }
 

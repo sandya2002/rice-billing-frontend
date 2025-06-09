@@ -10,6 +10,7 @@ import { HomeComponent } from './components/home/home.component';
 import { AppRoutingModule } from './app-routing.module';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { InvoiceModalComponent } from './components/invoice-modal/invoice-modal.component';
+import { TransactionsComponent } from './components/transactions/transactions.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { InvoiceModalComponent } from './components/invoice-modal/invoice-modal.
     HomeComponent,
     DashboardComponent,
     ForgotPasswordComponent,
-    InvoiceModalComponent
+    InvoiceModalComponent,
+    TransactionsComponent
   ],
   imports: [
     BrowserModule,

@@ -9,9 +9,9 @@ export interface InvoiceData {
   id: number;
   invoiceNo: string;
   invoiceDate: string;
-  billingName: string;
+  receiverName: string;
   totalAmount: number;
-  items: InvoiceItem[];
+  products: Product[];
   transportMode: string;
   vehicleNo: string;
   referenceNo: string;
@@ -25,3 +25,34 @@ export interface InvoiceData {
   specialDiscount: number;
   shippingHandling: number;
 }
+
+export interface Product {
+  description: string;
+  quantity: number;
+  unit: string;
+  unitPrice: string;
+  taxRate: string;
+}
+
+// export interface InvoiceRequest {
+//   receivernamecloumncell: string;
+//   adderssrow1: string;
+//   adderssrow2: string;
+//   phonenumberrow: string;
+//   gstrow: string;
+
+//   shippingnamecloumncell: string;
+//   shippingadderssrow1: string;
+//   shippingadderssrow2: string;
+//   shippingphonenumberrow: string;
+//   shippinggstrow: string;
+
+//   transportmoderow: string;
+//   vechilenorow: string;
+//   referencenorow: string;
+//   specialDiscount: number;
+//   finaltaxvalue: number;
+
+//   products: Product[];
+  
+// }

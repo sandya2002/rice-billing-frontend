@@ -74,7 +74,8 @@ export class InvoiceService {
 
   private apiUrl = 'http://localhost:8080/api/bill/generate';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { 
+  }
 
   // ✅ Save invoice to database
   saveInvoiceData(invoiceData: InvoiceData): Observable<any> {
@@ -85,9 +86,8 @@ export class InvoiceService {
   // ✅ Generate and download Excel from backend
   generateBill(invoiceData: any): Observable<Blob> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post(this.apiUrl, invoiceData, {
-      headers,
-      responseType: 'blob'
+   return this.http.post('http://localhost:8080/api/bill/generate', invoiceData, {
+    responseType: 'blob'
     });
   }
 }

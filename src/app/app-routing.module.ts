@@ -6,6 +6,7 @@ import { SignupComponent } from './components/signup/signup.component';
 import { HomeComponent } from './components/home/home.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { InvoiceModalComponent } from './components/invoice-modal/invoice-modal.component';
+import { TransactionsComponent } from './components/transactions/transactions.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -14,6 +15,7 @@ const routes: Routes = [
     { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'invoices', component: InvoiceModalComponent },
+  {path:'transactions',component:TransactionsComponent},
   {path: 'home',component:HomeComponent},
   { path: '', redirectTo: '/signup', pathMatch: 'full' }
 ];
