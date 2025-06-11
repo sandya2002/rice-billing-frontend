@@ -65,6 +65,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { InvoiceData } from './invoice.model';
+import { Payment } from '../transactions/payment.service';
 
 @Injectable({
   providedIn: 'root'
@@ -77,7 +78,18 @@ export class InvoiceService {
   constructor(private http: HttpClient) { 
   }
 
-  // ✅ Save invoice to database
+//   markFullPayment(invoiceNumber: string): Observable<any> {
+//   const url = `${this.apiUrl}/update`;
+//   const params = {
+//     invoiceNumber: invoiceNumber,
+//     fullPayment: true,
+//   };
+
+//   return this.http.put(url, null, { params });
+// }
+
+  // ✅ Save 
+  // invoice to database
   saveInvoiceData(invoiceData: InvoiceData): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(this.apiUrl, invoiceData, { headers });
@@ -90,4 +102,14 @@ export class InvoiceService {
     responseType: 'blob'
     });
   }
+
+  markInvoiceAsPaid(invoiceNumber: string) {
+  return this.http.put<Payment>(`/api/payment/update`, null, {
+    params: {
+      invoiceNumber,
+      fullPayment: true,
+    },
+  });
+}
+
 }

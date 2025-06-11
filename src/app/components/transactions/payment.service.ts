@@ -3,12 +3,17 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 
 export interface Payment {
+  totalAmount: number;
   id: number;
   invoiceNumber: string;
   pendingAmount: number;
   paidAmount: number;
   status: 'paid' | 'unpaid';
-  dueDate?: string; // Add if available
+  dueDate?: string;
+  date:Date;
+  specialDiscount:DoubleRange;
+  totalTax:DoubleRange;
+
 }
 
 @Injectable({
@@ -26,17 +31,32 @@ export class PaymentService {
 //     return this.http.get<Payment>(`${this.baseUrl}/get?invoiceNumber=${invoiceNumber}`);
 //   }
 
-getAllTransactions(): Observable<Payment[]> {
-  const invoiceNumber='SAT/2025/1';
-    console.log("Calling API to get transactions...");
-  return this.http.get<Payment[]>(`http://localhost:8080/api/payment/get?invoiceNumber=${invoiceNumber}`);
+getAllTransactions(invoiceNumber: string): Observable<Payment[]> {
+  console.log("Calling API for invoice:", invoiceNumber);
+
+  const params = new HttpParams().set('invoiceNumber', invoiceNumber);
+  return this.http.get<Payment[]>(`${this.baseUrl}/get`, { params });
 }
-getPayment(invoiceNumber: string): Observable<Payment> {
-  console.log(`working `)
-    return this.http.get<Payment>(`${this.baseUrl}/get`, {
-      params: new HttpParams().set('invoiceNumber', invoiceNumber)
-    });
-  }
+
+// getPayment(invoiceNumber: string): Observable<Payment> {
+//   console.log(`working `)
+//     return this.http.get<Payment>(`${this.baseUrl}/get`, {
+//       params: new HttpParams().set('invoiceNumber', invoiceNumber)
+//     });
+//   }
+
+getPayment(InvoiceNumber: string): Observable<any> {
+  return this.http.get(`http://localhost:8080/api/payment/get?invoiceNumber=${InvoiceNumber}`);
+}
+ markFullPayment(invoiceNumber: string): Observable<any> {
+  const url = `http://localhost:8080/api/payment/update`;
+  const params = {
+    invoiceNumber: invoiceNumber,
+    fullPayment: true,
+  };
+
+  return this.http.put(url, null, { params });
+}
 
   // Create new payment (initial entry)
   createPayment(invoiceNumber: string, pendingAmount: number): Observable<Payment> {

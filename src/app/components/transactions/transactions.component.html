@@ -98,17 +98,17 @@
             (keyup.enter)="searchByInvoice()">
         </div>
         <button class="search-btn" (click)="searchPayment()" [disabled]="isLoading">
-          <span *ngIf="!isLoading">Search</span>
-          <span *ngIf="isLoading">Searching...</span>
-        </button>
+          <span *ngIf="!isLoading">Search</span>        </button>  
         <button class="clear-btn" (click)="clearSearch()" *ngIf="searchInvoiceNumber">
           Clear
         </button>
       </div>
-      <!-- <div class="payment-summary" style="margin-top: 10px;">
-  <p><strong>Total Paid Amount:</strong> ₹{{ paidAmount }}</p>
-  <p><strong>Total Pending Amount:</strong> ₹{{ pendingAmount }}</p>
+      <!-- <div class="payment-summary">
+  <p>Total Amount: {{ formatCurrency(summaryStats?.totalAmount) }}</p>
+  <p>Paid Amount: {{ formatCurrency(summaryStats?.paidAmount) }}</p>
+  <p>Pending Amount: {{ formatCurrency(summaryStats?.pendingAmount) }}</p>
 </div> -->
+
 <div *ngIf="transactionSummary">
   Unpaid Count: {{ transactionSummary.unpaidCount }}
 </div>

@@ -1,15 +1,10 @@
 /* Invoice Modal Overlay */
 .invoice-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 9999;
-  overflow-y: auto;
-  padding: 20px 0;
+  display: block !important;
+  opacity: 1 !important;
+  z-index: 9999 !important;
 }
+
 
 /* Invoice Container */
 .invoice-container {
@@ -961,4 +956,550 @@ textarea:focus-visible {
 input[readonly] {
   background-color: #f0f0f0;
   cursor: not-allowed;
+}
+
+
+
+
+/* Enhanced styles for the new features */
+.auto-fields-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 15px;
+  margin: 20px 0;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.auto-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.auto-label {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-bottom: 5px;
+}
+
+.auto-value {
+  font-size: 16px;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 5px 15px;
+  border-radius: 20px;
+}
+
+.readonly-input {
+  background-color: #f5f5f5 !important;
+  color: #666 !important;
+  cursor: not-allowed;
+}
+
+/* Enhanced calculation section */
+.discount-row {
+  background-color: #fff3cd;
+}
+
+.tax-row {
+  background-color: #d1ecf1;
+}
+
+.discount-input {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.discount-amount {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.tax-amount {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.tax-rate {
+  font-size: 12px;
+  color: #666;
+}
+
+.calculated-field {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  color: #495057;
+}
+
+/* Payment section styles */
+.payment-section {
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  background: #f8f9fa;
+}
+
+.payment-title {
+  margin: 0 0 15px 0;
+  color: #495057;
+  font-size: 18px;
+  border-bottom: 2px solid #dee2e6;
+  padding-bottom: 10px;
+}
+
+.payment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+  align-items: start;
+}
+
+.payment-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.payment-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #495057;
+}
+
+.payment-input,
+.payment-select {
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.payment-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: bold;
+  color: #495057;
+}
+
+.payment-checkbox input[type="checkbox"] {
+  margin-right: 10px;
+  transform: scale(1.2);
+}
+
+.checkmark {
+  margin-left: 5px;
+}
+
+.payment-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.payment-status.paid {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+}
+
+.payment-status.unpaid {
+  background: linear-gradient(135deg, #ffc107, #fd7e14);
+  color: white;
+}
+
+.status-icon {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.status-text {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.status-amount {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Enhanced invoice cards */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.card-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.status-badge.paid {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.unpaid {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.card-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.info-label {
+  font-weight: bold;
+  color: #666;
+}
+
+.info-value {
+  color: #333;
+}
+
+.info-value.discount {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.info-value.tax {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.total-amount-section {
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.total-label {
+  font-weight: bold;
+  color: #666;
+}
+
+.total-amount {
+  font-size: 18px;
+  font-weight: bold;
+  color: #28a745;
+}
+
+/* Enhanced action buttons */
+.card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.card-actions button {
+  flex: 1;
+  min-width: 70px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.view-btn {
+  background: #007bff;
+  color: white;
+}
+
+.view-btn:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.pay-btn {
+  background: #28a745;
+  color: white;
+}
+
+.pay-btn:hover {
+  background: #1e7e34;
+  transform: translateY(-1px);
+}
+
+.delete-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+/* Form action buttons enhancement */
+.form-action-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin: 30px 0;
+  flex-wrap: wrap;
+}
+
+.form-action-buttons button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.print-btn {
+  background: linear-gradient(135deg, #6c757d, #495057);
+  color: white;
+}
+
+.reset-btn {
+  background: linear-gradient(135deg, #ffc107, #e0a800);
+  color: #212529;
+}
+
+.done-btn {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+}
+
+.form-action-buttons button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Search enhancement */
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  color: #666;
+  z-index: 1;
+}
+
+.search-input {
+  padding-left: 40px;
+}
+
+/* No results and empty state */
+.no-results,
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.no-results-icon,
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.clear-search-btn {
+  padding: 8px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.clear-search-btn:hover {
+  background: #0056b3;
+}
+
+/* Items table enhancement */
+.items-table th {
+  background: linear-gradient(135deg, #495057, #6c757d);
+  color: white;
+  padding: 12px 8px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.items-table td {
+  padding: 8px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.items-table input {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.remove-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.remove-btn:hover {
+  background: #c82333;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .auto-fields-section {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .payment-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .card-info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-action-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .form-action-buttons button {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .form-action-buttons,
+  .saved-invoices-container,
+  .close-btn,
+  .edit-mode-indicator {
+    display: none !important;
+  }
+  
+  .invoice-container {
+    box-shadow: none;
+    margin: 0;
+    max-width: none;
+  }
+  
+  .payment-section {
+    border: 1px solid #000;
+  }
+  
+  .auto-fields-section {
+    background: #f0f0f0;
+    color: #000;
+  }
+}
+
+/* Animation for status changes */
+.status-badge,
+.payment-status {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Enhanced hover effects */
+.invoice-card {
+  transition: all 0.3s ease;
+}
+
+.invoice-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* Loading state for buttons */
+.form-action-buttons button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Success/Error message styles */
+.message {
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin: 10px 0;
+  font-weight: bold;
+}
+
+.message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
 }

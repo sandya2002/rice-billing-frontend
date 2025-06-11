@@ -34,6 +34,25 @@ interface SavedInvoice {
   shippingGst: string;
   specialDiscount: number;
   shippingHandling: number;
+  totalTax: number;
+  status: 'paid' | 'unpaid';
+  paidAmount: number;
+  dueDate: string;
+  paidDate?: string;
+  paymentMethod?: string;
+}
+interface Transaction {
+  id: number;
+  customerId: number;
+  customerName: string;
+  invoiceNumber: string;
+  date: Date;
+  amount: number;
+  status: 'paid' | 'unpaid';
+  dueDate?: Date;
+  paidDate?: Date;
+  items?: string;
+  paymentMethod?: string;
 }
 
 @Component({
@@ -79,7 +98,10 @@ export class InvoiceModalComponent implements OnInit {
   // Calculation fields
   specialDiscount: number = 0;
   shippingHandling: number = 0;
-  
+  // Payment fields
+  paymentMethod: string = '';
+  isPaid: boolean = false;
+  dueDate: string = '';
   // Saved Invoices
   savedInvoices: SavedInvoice[] = [];
   filteredInvoices: SavedInvoice[] = [];
@@ -89,15 +111,25 @@ export class InvoiceModalComponent implements OnInit {
   // Edit Mode Tracking
   isEditMode: boolean = false;
   editingInvoiceId: number | null = null;
+  paymentSummary: any;
+  paymentService: any;
   
   constructor(private router: Router, private invoiceService: InvoiceService ) { }
   
   ngOnInit(): void {
     this.setCurrentDate();
+    this.setDueDate();
     this.loadSavedInvoices();
     this.generateInvoiceNumber();
   }
-  
+  setDueDate(): void {
+    const today = new Date();
+    const dueDate = new Date(today.setDate(today.getDate() + 30)); // 30 days from now
+    const day = String(dueDate.getDate()).padStart(2, '0');
+    const month = String(dueDate.getMonth() + 1).padStart(2, '0');
+    const year = dueDate.getFullYear();
+    this.dueDate = `${day}/${month}/${year}`;
+  }
   setCurrentDate(): void {
     const today = new Date();
     const day = String(today.getDate()).padStart(2, '0');
@@ -108,10 +140,19 @@ export class InvoiceModalComponent implements OnInit {
   
   generateInvoiceNumber(): void {
     const year = new Date().getFullYear();
+    const month = String(new Date().getMonth() + 1).padStart(2, '0');
     const invoiceCount = this.savedInvoices.length + 1;
-    this.invoiceNo = `SAT/${year}/${String(invoiceCount).padStart(4, '0')}`;
+    this.invoiceNo = `INV-${year}-${month}-${String(invoiceCount).padStart(3, '0')}`;
   }
-  
+  getInvoiceCountForCurrentMonth(): number {
+    const currentYear = new Date().getFullYear();
+    const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+    const prefix = `INV-${currentYear}-${currentMonth}`;
+    
+    return this.savedInvoices.filter(invoice => 
+      invoice.invoiceNo.startsWith(prefix)
+    ).length;
+  }
   loadSavedInvoices(): void {
     // Load from localStorage
     const saved = localStorage.getItem('savedInvoices');
@@ -123,7 +164,157 @@ export class InvoiceModalComponent implements OnInit {
         : 1;
     }
   }
+
+
+
+onPaymentStatusChange(): void {
+  if (!this.paymentSummary || !this.paymentSummary.invoiceNumber) {
+    alert('No invoice loaded Testing');
+    return;
+  }
+
+  const invoiceNumber = this.paymentSummary.invoiceNumber;
+
+  if (this.isPaid) {
+    this.paymentService.markInvoiceAsPaid(invoiceNumber).subscribe({
+      next: (updatedPayment: { pendingAmount: any; }) => {
+        console.log("✅ Invoice marked as paid",updatedPayment);
+        // Update UI
+        this.paymentSummary.paidAmount = this.paymentSummary.totalAmount;
+        this.paymentSummary.pendingAmount = updatedPayment.pendingAmount;
+      },
+      error: (err: any) => {
+        console.error("❌ Error marking invoice as paid:", err);
+        this.isPaid = false; // Revert checkbox
+      }
+    });
+  }
+}
+
+   saveInvoice(): void {
+  // Validate form
+  if (!this.invoiceNo || !this.billingName) {
+    alert('Please fill Invoice Number and Billing Name at minimum');
+    return;
+  }
+
+  const hasValidItem = this.invoiceItems.some(item =>
+    item.description && item.quantity > 0 && item.unitPrice > 0
+  );
+
+  if (!hasValidItem) {
+    alert('Please add at least one item with description, quantity and price');
+    return;
+  }
+
+  this.invoiceService.generateBill({
+    invoiceNo: this.invoiceNo,
+    invoiceDate: this.invoiceDate,
+    billingName: this.billingName,
+    totalAmount: this.getBalanceDue(),
+    items: this.invoiceItems,
+    transportMode: this.transportMode,
+    vehicleNo: this.vehicleNo,
+    referenceNo: this.referenceNo,
+    billingAddress: this.billingAddress,
+    billingPhone: this.billingPhone,
+    billingGst: this.billingGst,
+    shippingName: this.shippingName,
+    shippingAddress: this.shippingAddress,
+    shippingPhone: this.shippingPhone,
+    shippingGst: this.shippingGst,
+    specialDiscount: this.specialDiscount,
+    shippingHandling: this.shippingHandling
+  }).subscribe({
+    next: (response: Blob) => {
+      const blob = new Blob([response], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      });
+      const downloadUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = `${this.invoiceNo}.xlsx`;
+      a.click();
+      alert('Invoice saved and downloaded successfully!');
+      this.resetForm();
+    },
+    error: (err) => {
+      console.error('Error saving invoice to backend', err);
+      alert('Failed to save invoice to backend');
+    }
+  });
+}
+  createTransaction(invoice: SavedInvoice, itemsDescription: string): void {
+    const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+    
+    const newTransaction: Transaction = {
+      id: transactions.length + 1,
+      customerId: invoice.id,
+      customerName: invoice.billingName,
+      invoiceNumber: invoice.invoiceNo,
+      date: new Date(invoice.invoiceDate.split('/').reverse().join('-')),
+      amount: invoice.totalAmount,
+      status: invoice.status,
+      dueDate: invoice.status === 'unpaid' ? new Date(invoice.dueDate.split('/').reverse().join('-')) : undefined,
+      paidDate: invoice.status === 'paid' ? new Date(invoice.invoiceDate.split('/').reverse().join('-')) : undefined,
+      items: itemsDescription,
+      paymentMethod: invoice.paymentMethod
+    };
+    
+    transactions.push(newTransaction);
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+  }
   
+  updateTransaction(invoice: SavedInvoice, itemsDescription: string): void {
+    const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+    const transactionIndex = transactions.findIndex((t: Transaction) => t.invoiceNumber === invoice.invoiceNo);
+    
+    if (transactionIndex !== -1) {
+      transactions[transactionIndex] = {
+        ...transactions[transactionIndex],
+        customerName: invoice.billingName,
+        amount: invoice.totalAmount,
+        status: invoice.status,
+        dueDate: invoice.status === 'unpaid' ? new Date(invoice.dueDate.split('/').reverse().join('-')) : undefined,
+        paidDate: invoice.status === 'paid' ? new Date(invoice.invoiceDate.split('/').reverse().join('-')) : undefined,
+        items: itemsDescription,
+        paymentMethod: invoice.paymentMethod
+      };
+      
+      localStorage.setItem('transactions', JSON.stringify(transactions));
+    }
+  }
+  
+  markAsPaid(invoice: SavedInvoice): void {
+    if (confirm(`Mark invoice ${invoice.invoiceNo} as paid for ${invoice.billingName}?`)) {
+      const invoiceIndex = this.savedInvoices.findIndex(inv => inv.id === invoice.id);
+      
+      if (invoiceIndex !== -1) {
+        // Update invoice status
+        this.savedInvoices[invoiceIndex].status = 'paid';
+        this.savedInvoices[invoiceIndex].paidAmount = invoice.totalAmount;
+        this.savedInvoices[invoiceIndex].paidDate = new Date().toLocaleDateString('en-GB');
+        this.savedInvoices[invoiceIndex].paymentMethod = 'Cash'; // Default payment method
+        
+        // Update transaction
+        const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+        const transactionIndex = transactions.findIndex((t: Transaction) => t.invoiceNumber === invoice.invoiceNo);
+        
+        if (transactionIndex !== -1) {
+          transactions[transactionIndex].status = 'paid';
+          transactions[transactionIndex].paidDate = new Date();
+          transactions[transactionIndex].paymentMethod = 'Cash';
+          localStorage.setItem('transactions', JSON.stringify(transactions));
+        }
+        
+        // Save updated invoices
+        localStorage.setItem('savedInvoices', JSON.stringify(this.savedInvoices));
+        this.filteredInvoices = [...this.savedInvoices];
+        
+        alert('Invoice marked as paid successfully!');
+      }
+    }
+  }
   resetForm(): void {
     // Reset edit mode
     this.isEditMode = false;
@@ -161,7 +352,8 @@ export class InvoiceModalComponent implements OnInit {
     // Generate new invoice number and date
     this.generateInvoiceNumber();
     this.setCurrentDate();
-    
+     this.setDueDate();
+   
     // Clear search
     this.searchTerm = '';
     this.filteredInvoices = [...this.savedInvoices];
@@ -201,23 +393,43 @@ export class InvoiceModalComponent implements OnInit {
     this.invoiceItems = [...invoice.items];
     this.specialDiscount = invoice.specialDiscount;
     this.shippingHandling = invoice.shippingHandling;
-    
+    this.isPaid = invoice.status === 'paid';
+    this.paymentMethod = invoice.paymentMethod || '';
+    this.dueDate = invoice.dueDate;
     // Scroll to form
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   
   deleteInvoice(id: number): void {
     if (confirm('Are you sure you want to delete this invoice?')) {
+      const invoice = this.savedInvoices.find(inv => inv.id === id);
+      
+      if (invoice) {
+        // Delete associated transaction
+        const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+        const updatedTransactions = transactions.filter((t: Transaction) => t.invoiceNumber !== invoice.invoiceNo);
+        localStorage.setItem('transactions', JSON.stringify(updatedTransactions));
+      }
+      
+      // Update both arrays
       this.savedInvoices = this.savedInvoices.filter(inv => inv.id !== id);
-      this.filteredInvoices = this.savedInvoices.filter(inv => 
-        inv.billingName.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
+      
+      // Update filtered invoices by removing the deleted invoice first
+      this.filteredInvoices = this.filteredInvoices.filter(inv => inv.id !== id);
+      
+      // Then apply any active search filter if needed
+      if (this.searchTerm.trim() !== '') {
+        this.searchInvoices();
+      }
+      
       localStorage.setItem('savedInvoices', JSON.stringify(this.savedInvoices));
       
       // If we're deleting the invoice currently being edited, reset the form
       if (this.isEditMode && this.editingInvoiceId === id) {
         this.resetForm();
       }
+      
+      alert('Invoice deleted successfully!');
     }
   }
   
@@ -280,69 +492,119 @@ export class InvoiceModalComponent implements OnInit {
   getBalanceDue(): number {
     return this.getSubtotalLessDiscount() + this.shippingHandling;
   }
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 0
+    }).format(amount);
+  }
   
   printInvoice(): void {
     window.print();
   }
   
-    closeModal(): void {
+  closeModal(): void {
     this.router.navigate(['/dashboard']);
   }
-  saveInvoice(): void {
-  // Validate form
-  if (!this.invoiceNo || !this.billingName) {
-    alert('Please fill Invoice Number and Billing Name at minimum');
-    return;
-  }
-
-  const hasValidItem = this.invoiceItems.some(item =>
-    item.description && item.quantity > 0 && item.unitPrice > 0
-  );
-
-  if (!hasValidItem) {
-    alert('Please add at least one item with description, quantity and price');
-    return;
-  }
-
-  this.invoiceService.generateBill({
-    invoiceNo: this.invoiceNo,
-    invoiceDate: this.invoiceDate,
-    billingName: this.billingName,
-    totalAmount: this.getBalanceDue(),
-    items: this.invoiceItems,
-    transportMode: this.transportMode,
-    vehicleNo: this.vehicleNo,
-    referenceNo: this.referenceNo,
-    billingAddress: this.billingAddress,
-    billingPhone: this.billingPhone,
-    billingGst: this.billingGst,
-    shippingName: this.shippingName,
-    shippingAddress: this.shippingAddress,
-    shippingPhone: this.shippingPhone,
-    shippingGst: this.shippingGst,
-    specialDiscount: this.specialDiscount,
-    shippingHandling: this.shippingHandling
-  }).subscribe({
-    next: (response: Blob) => {
-      const blob = new Blob([response], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      });
-      const downloadUrl = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = downloadUrl;
-      a.download = `${this.invoiceNo}.xlsx`;
-      a.click();
-      alert('Invoice saved and downloaded successfully!');
-      this.resetForm();
-    },
-    error: (err) => {
-      console.error('Error saving invoice to backend', err);
-      alert('Failed to save invoice to backend');
-    }
-  });
 }
 
-}
+
+  //   deleteInvoice(id: number): void {
+  //   if (confirm('Are you sure you want to delete this invoice?')) {
+  //     const invoice = this.savedInvoices.find(inv => inv.id === id);
+      
+  //     if (invoice) {
+  //       // Delete associated transaction
+  //       const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+  //       const updatedTransactions = transactions.filter((t: Transaction) => t.invoiceNumber !== invoice.invoiceNo);
+  //       localStorage.setItem('transactions', JSON.stringify(updatedTransactions));
+  //     }
+      
+  //     // Update both arrays
+  //     this.savedInvoices = this.savedInvoices.filter(inv => inv.id !== id);
+      
+  //     // Update filtered invoices by removing the deleted invoice first
+  //     this.filteredInvoices = this.filteredInvoices.filter(inv => inv.id !== id);
+      
+  //     // Then apply any active search filter if needed
+  //     if (this.searchTerm.trim() !== '') {
+  //       this.searchInvoices();
+  //     }
+      
+  //     localStorage.setItem('savedInvoices', JSON.stringify(this.savedInvoices));
+      
+  //     // If we're deleting the invoice currently being edited, reset the form
+  //     if (this.isEditMode && this.editingInvoiceId === id) {
+  //       this.resetForm();
+  //     }
+      
+  //     alert('Invoice deleted successfully!');
+  //   }
+  // }
+
+  
+//   printInvoice(): void {
+//     window.print();
+//   }
+  
+//     closeModal(): void {
+//     this.router.navigate(['/dashboard']);
+//   }
+//   saveInvoice(): void {
+//   // Validate form
+//   if (!this.invoiceNo || !this.billingName) {
+//     alert('Please fill Invoice Number and Billing Name at minimum');
+//     return;
+//   }
+
+//   const hasValidItem = this.invoiceItems.some(item =>
+//     item.description && item.quantity > 0 && item.unitPrice > 0
+//   );
+
+//   if (!hasValidItem) {
+//     alert('Please add at least one item with description, quantity and price');
+//     return;
+//   }
+
+//   this.invoiceService.generateBill({
+//     invoiceNo: this.invoiceNo,
+//     invoiceDate: this.invoiceDate,
+//     billingName: this.billingName,
+//     totalAmount: this.getBalanceDue(),
+//     items: this.invoiceItems,
+//     transportMode: this.transportMode,
+//     vehicleNo: this.vehicleNo,
+//     referenceNo: this.referenceNo,
+//     billingAddress: this.billingAddress,
+//     billingPhone: this.billingPhone,
+//     billingGst: this.billingGst,
+//     shippingName: this.shippingName,
+//     shippingAddress: this.shippingAddress,
+//     shippingPhone: this.shippingPhone,
+//     shippingGst: this.shippingGst,
+//     specialDiscount: this.specialDiscount,
+//     shippingHandling: this.shippingHandling
+//   }).subscribe({
+//     next: (response: Blob) => {
+//       const blob = new Blob([response], {
+//         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+//       });
+//       const downloadUrl = URL.createObjectURL(blob);
+//       const a = document.createElement('a');
+//       a.href = downloadUrl;
+//       a.download = `${this.invoiceNo}.xlsx`;
+//       a.click();
+//       alert('Invoice saved and downloaded successfully!');
+//       this.resetForm();
+//     },
+//     error: (err) => {
+//       console.error('Error saving invoice to backend', err);
+//       alert('Failed to save invoice to backend');
+//     }
+//   });
+// }
+
 // export class InvoiceComponent {
 //   invoiceRequest: InvoiceData = {
 //     receivernamecloumncell: 'Receiver Name',

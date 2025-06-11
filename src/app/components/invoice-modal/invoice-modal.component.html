@@ -32,6 +32,17 @@
           <p class="bill-type">EXEMPTED BILL ORIGINAL/DUPLICATE/TRIPLICATE</p>
         </div>
       </div>
+      <!-- Auto-generated Fields Display -->
+      <div class="auto-fields-section">
+        <div class="auto-field">
+          <label class="auto-label">Auto-Generated Invoice No:</label>
+          <span class="auto-value">{{ invoiceNo }}</span>
+        </div>
+        <div class="auto-field">
+          <label class="auto-label">Generated Date:</label>
+          <span class="auto-value">{{ invoiceDate }}</span>
+        </div>
+      </div>
       
       <!-- Invoice Details Section -->
       <div class="invoice-info">
@@ -181,14 +192,17 @@
                 <input type="number" 
                        [(ngModel)]="item.taxRate" 
                        (change)="calculateRow(i)"
-                       placeholder="0">
+                       placeholder="0"
+                       min="0"
+                       max="100"
+                       step="0.01">
               </td>
-              <td>{{ item.subTotal.toFixed(2) }}</td>
-              <td>{{ item.total.toFixed(2) }}</td>
+              <td class="calculated-field">{{ item.subTotal.toFixed(2) }}</td>
+              <td class="calculated-field">{{ item.total.toFixed(2) }}</td>
               <td>
                 <button class="remove-btn" 
                         (click)="removeRow(i)" 
-                        *ngIf="invoiceItems.length > 1">×</button>
+                        *ngIf="invoiceItems.length > 1" title="Remove Row">×</button>
               </td>
             </tr>
           </tbody>
@@ -248,6 +262,93 @@
           </tr>
         </table>
       </div>
+      <!-- Enhanced Calculation Section -->
+      <div class="calculation-section">
+        <table class="calculation-table">
+          <tr>
+            <td class="calc-label">SUBTOTAL</td>
+            <td class="calc-value">{{ getSubtotal().toFixed(2) }}</td>
+            <td class="calc-total">{{ getTotal().toFixed(2) }}</td>
+          </tr>
+          <tr class="discount-row">
+            <td class="calc-label">SPECIAL DISCOUNT</td>
+            <td class="calc-value">
+              <input type="number" 
+                     [(ngModel)]="specialDiscount" 
+                     placeholder="0.00"
+                     min="0"
+                     step="0.01"
+                     class="discount-input">
+            </td>
+            <td class="calc-total discount-amount">-{{ specialDiscount.toFixed(2) }}</td>
+          </tr>
+          <tr>
+            <td class="calc-label">SUBTOTAL LESS DISCOUNT</td>
+            <td class="calc-value"></td>
+            <td class="calc-total">{{ getSubtotalLessDiscount().toFixed(2) }}</td>
+          </tr>
+          <tr class="tax-row">
+            <td class="calc-label">TOTAL TAX AMOUNT</td>
+            <td class="calc-value tax-rate">{{ getTaxRate().toFixed(2) }}%</td>
+            <td class="calc-total tax-amount">{{ getTotalTax().toFixed(2) }}</td>
+          </tr>
+          <tr>
+            <td class="calc-label">SHIPPING/HANDLING</td>
+            <td class="calc-value">
+              <input type="number" 
+                     [(ngModel)]="shippingHandling" 
+                     placeholder="0.00"
+                     min="0"
+                     step="0.01">
+            </td>
+            <td class="calc-total">{{ shippingHandling.toFixed(2) }}</td>
+          </tr>
+          <tr class="balance-due-row">
+            <td class="calc-label">BALANCE DUE</td>
+            <td class="calc-value"></td>
+            <td class="calc-total">{{ getBalanceDue().toFixed(2) }}</td>
+          </tr>
+        </table>
+      </div>
+      
+      <!-- Payment Section -->
+      <div class="payment-section">
+        <h3 class="payment-title">Payment Information</h3>
+        <div class="payment-grid">
+          <div class="payment-field">
+            <label class="payment-label">Due Date:</label>
+            <input type="text" [(ngModel)]="dueDate" class="payment-input" placeholder="DD/MM/YYYY">
+          </div>
+          
+          <div class="payment-field">
+            <label class="payment-checkbox">
+              <input type="checkbox" 
+                     [(ngModel)]="isPaid" 
+                     (change)="onPaymentStatusChange()">
+              <span class="checkmark"></span>
+              Mark as Paid (Full Amount)
+            </label>
+          </div>
+          
+          <div class="payment-field" *ngIf="isPaid">
+            <label class="payment-label">Payment Method:</label>
+            <select [(ngModel)]="paymentMethod" class="payment-select" required>
+              <option value="">Select Payment Method</option>
+              <option value="Cash">Cash</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="UPI">UPI</option>
+              <option value="Cheque">Cheque</option>
+              <option value="Credit Card">Credit Card</option>
+            </select>
+          </div>
+          
+          <div class="payment-status" [class.paid]="isPaid" [class.unpaid]="!isPaid">
+            <span class="status-icon">{{ isPaid ? '✅' : '⏳' }}</span>
+            <span class="status-text">{{ isPaid ? 'PAID' : 'UNPAID' }}</span>
+            <span class="status-amount">{{ formatCurrency(getBalanceDue()) }}</span>
+          </div>
+        </div>
+      </div>
       
       <!-- Action buttons at bottom -->
       <div class="form-action-buttons">
@@ -260,10 +361,12 @@
       
       <!-- Saved Invoices Section - Now inside the invoice wrapper -->
       <div class="saved-invoices-container" *ngIf="savedInvoices.length > 0">
-        <h2 class="saved-invoices-title">Saved Invoices</h2>
+        <h2 class="saved-invoices-title"><i class="icon-invoices"></i>Saved Invoices({{ savedInvoices.length }})</h2>
         
         <!-- Search Bar -->
         <div class="search-container">
+          <div class="search-input-wrapper">
+            <i class="search-icon">🔍</i>
           <input type="text" 
                  class="search-input" 
                  [(ngModel)]="searchTerm" 
@@ -276,7 +379,12 @@
           <div class="invoice-card" *ngFor="let invoice of filteredInvoices">
                         <div class="card-header">
               <h3>{{ invoice.billingName }}</h3>
+              <div class="card-header-right">
               <span class="invoice-number">{{ invoice.invoiceNo }}</span>
+              <span [class]="'status-badge ' + invoice.status">
+                  {{ invoice.status ? invoice.status.toUpperCase():'N/A' }}
+                  </span>
+            </div>
             </div>
             <div class="card-body">
               <p><strong>Date:</strong> {{ invoice.invoiceDate }}</p>
@@ -295,6 +403,13 @@
         <div class="no-results" *ngIf="filteredInvoices.length === 0 && searchTerm">
           <p>No invoices found for "{{ searchTerm }}"</p>
         </div>
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="savedInvoices.length === 0">
+          <div class="empty-icon">📄</div>
+          <h3>No invoices yet</h3>
+          <p>Create your first invoice to get started</p>
+        </div>
+      </div>
       </div>
     </div>
   </div>
